@@ -2,39 +2,17 @@ import 'react-hot-loader/patch';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import 'babel-polyfill';
-import styled, { css } from 'styled-Components';
+import styled, { css } from 'styled-components';
 import { Provider, Subscribe, Container } from 'unstated';
 import UNSTATED from 'unstated-debug'
 
-import {Tabbar, Tab, Segment, Icon, Page, Toolbar, Button, BackButton, ToolbarButton } from 'react-onsenui';
 import Tree from './components/Tree';
-import Calendar from './components/Calendar';
-import TmpTodo from './components/TmpTodo';
-import ForceTodo from './components/ForceTodo';
 import CustomDrawer from './components/Drawer';
 import DrawerC from './containers/DrawerC';
-
-import 'onsenui/css/onsenui.min.css';
-import 'onsenui/css/onsen-css-components.min.css';
 import 'antd/dist/antd.css';
 /***********/
 import { AppContainer } from 'react-hot-loader'
 /***********/
-
-class TabPage extends React.Component {
-  render() {
-    return (
-      <Page>
-        <Toolbar>
-          <div className="center">{this.props.title}</div>
-        </Toolbar>
-        <TodoWrapper>
-          {this.props.title == 'Home' && <TmpTodo/>}
-        </TodoWrapper>
-      </Page>
-    );
-  }
-}
 class AppC extends Container {
   state = {
     index: 0,
@@ -87,15 +65,12 @@ export default class App extends Component {
     return (
       <Subscribe to={[DrawerC]}>
         {(drawer) => (
-          <Page renderToolbar={() => this.onRenderToolBar()}>
+          <div>
             <div style={S.container}>
               <CustomDrawer/>
               {drawer.state.page == 'HOME' && <Home/>}
-              {drawer.state.page == 'TODO' && <TmpTodo/>}
-              {drawer.state.page == 'FORCE-TODO' && <ForceTodo/>}
-              {drawer.state.page == 'CALENDAR' && <Calendar/>}
             </div>
-          </Page>
+          </div>
         )}
       </Subscribe>
     );

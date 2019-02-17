@@ -1,22 +1,26 @@
 import { Container } from 'unstated';
 
 export default class MemoC extends Container {
-  data = [
+  state = {
+   data: [
     {
       id : 'sfsgasfq1111113&',
       name: 'parent1',
       toggled: true,
+      active: true,
       type : 'dir',
       children: [
         {
           id : 'sfsgsssssssxjsfq1111113&',
           name: 'child1',
+          active: true,
           type : 'file',
           content : 'ssss',
         },
         {
           id : 'sfsgasfq111&',
-          name: 'child1',
+          name: 'child2',
+          active: true,
           type : 'file',
           content : '',
         },
@@ -25,34 +29,37 @@ export default class MemoC extends Container {
     {
       id : '1111113&',
       name: 'parent2',
+      active: true,
       type : 'dir',
       toggled: true,
       children: [
         {
           id : '11fsfi1113&',
           name: 'nested parent',
+          active: true,
           type : 'dir',
           toggled: true,
           children: [
             {
               id : 'sfq1111113&',
-              name: 'child1',
+              name: 'child3',
+              active: true,
               type : 'file',
-              toggled: true,
               content : 'ssssss',
             },
             {
               id : 'sfsgasssfq111&',
-              name: 'child1',
+              name: 'child4',
+            active: true,
               type : 'file',
-              toggled: true,
               content : 'test',
             },
           ]
         }
       ]
     }
-  ];
+  ]
+  };
   node = [
     
   ];
