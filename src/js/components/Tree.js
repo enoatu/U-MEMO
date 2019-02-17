@@ -44,9 +44,26 @@ export default class Tree extends React.Component {
       type: e.target.type,
     });
   }
+  onOpen(data) {
+      const newData = this.treeRef.current.doChildren(
+        data,
+        {active: true},
+        false,//own apply
+        true,//lastnode apply
+      );
+      return(
+        <Subscribe to={[MemoC]}>
+          {(memo) => memo.setState({data: newData})}
+        </Subscribe>
+      );
+  }
   onClose(data) {
-      const newData = this.treeRef.current.doChildren(data, {active: false}, true);
-      console.log("newda",newData);
+      const newData = this.treeRef.current.doChildren(
+        data,
+        {active: false},
+        false,//own apply
+        true,//lastnode apply
+      );
       return(
         <Subscribe to={[MemoC]}>
           {(memo) => memo.setState({data: newData})}
@@ -63,17 +80,6 @@ export default class Tree extends React.Component {
       );
   }
 
-//            <Treebeard
-//              data={memo.data}
-//              onToggle={this.onToggle}
-//            />
-//  onToggle(node, toggled){
-//    if(this.state.cursor){this.state.cursor.active = false;}
-//    node.active = true;
-//    if(node.children){ node.toggled = toggled; }
-//    this.setState({ cursor: node });
-//  }
-
   renderNode(data, level) {
     return(
       <Subscribe to={[MemoC]}>
@@ -81,10 +87,18 @@ export default class Tree extends React.Component {
           <React.Fragment>
             {data.active ?
               <Node>
-                <Rotate onClick={() => this.onColor(data)}>▶</Rotate>
+                <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
+                <Space level={level}/>
                 <span style={{color: data.color || 'black'}}>{data.name}</span>
               </Node>
-            :null}
+            :
+              <Node>
+                <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
+                <Space level={level}/>
+                <span style={{color: data.color || 'black'}}>{data.name}</span>
+              </Node>
+            
+            }
           </React.Fragment>
         )}
       </Subscribe>
@@ -137,7 +151,7 @@ const TreeWrapper = css`
   background-color: red;
 `;
 
-const rotate = keyframes`
+const rotateRB = keyframes`
   from {
     transform: rotate(0deg);
   }
@@ -146,15 +160,32 @@ const rotate = keyframes`
     transform: rotate(90deg);
   }
 `;
+const rotateBR = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-90deg);
+  }
+`;
 
 const Node = styled.div`
   background-color: yellow;
 `;
 
-
-const Rotate = styled.span`
+const Space = styled.span`
+  margin: ;
+`;
+const RotateRB = styled.span`
   display: inline-block;
-  animation: ${rotate} 0.3s linear forwards;
+  animation: ${rotateRB} 0.3s linear forwards;
+  font-size: 1.2rem;
+`;
+
+const RotateBR = styled.span`
+  display: inline-block;
+  animation: ${rotateBR} 0.3s linear forwards;
   font-size: 1.2rem;
 `;
 

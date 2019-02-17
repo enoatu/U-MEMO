@@ -50,9 +50,16 @@ export default class MemoC extends Container {
             {
               id : 'sfsgasssfq111&',
               name: 'child4',
-            active: true,
+              active: true,
               type : 'file',
               content : 'test',
+            },
+            {
+              id : 'sfsgasssfsgsgq111&',
+              name: 'child5',
+              active: true,
+              type : 'dir',
+              children: [],
             },
           ]
         }
