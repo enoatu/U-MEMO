@@ -47,11 +47,11 @@ export default class Tree extends React.Component {
   }
   onOpen(data) {
     console.warn('open');
-      const newData = this.treeRef.current.doUnderTree(
+      const newData = this.treeRef.current.doUnderOne(
         data,
         {toggle: true, active: true}, //selfState
         {active: true}, //filestate
-        {toggle: true, active: true}, //dirstate
+        {toggle: false, active: true}, //dirstate
       );
       return(
         <Subscribe to={[MemoC]}>
@@ -59,6 +59,7 @@ export default class Tree extends React.Component {
         </Subscribe>
       );
   }
+
   onClose(data) {
     console.warn('close');
       const newData = this.treeRef.current.doUnderTree(
@@ -66,20 +67,14 @@ export default class Tree extends React.Component {
         {toggle: false, active: true}, //selfState
         {active: false}, //filestate
         {toggle: false, active: false}, //dirstate
-        false, //self apply
       );
-      //const newData = this.treeRef.current.doChildren(
-      //  data,
-      //  {active: false},
-      //  false,//own apply
-      //  true,//lastnode apply
-      //);
       return(
         <Subscribe to={[MemoC]}>
           {(memo) => memo.setState({data: newData})}
         </Subscribe>
       );
   }
+
   onColor(data) {
       const newData = this.treeRef.current.doChildren(data, {color: 'white'}, true);
       console.log("newda",newData);
@@ -100,14 +95,18 @@ export default class Tree extends React.Component {
                 {data.toggle?
                   <React.Fragment>
                     <Space level={level}/>
+                    <Row>
                     <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
-                    <span style={{color: data.color || 'black'}}>{data.name}</span>
+                      <span style={{color: data.color || 'black'}}>{data.name}</span>
+                    </Row>
                   </React.Fragment>
                 :
                   <React.Fragment>
                     <Space level={level}/>
-                    <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
-                    <span style={{color: data.color || 'black'}}>{data.name}</span>
+                    <Row>
+                      <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
+                      <span style={{color: data.color || 'black'}}>{data.name}</span>
+                    </Row>
                   </React.Fragment>
                 }
                 </Node>
@@ -123,7 +122,10 @@ export default class Tree extends React.Component {
         { data.active ?
           <LastNode key={data.id}>
             <Space level={level}/>
-            <span style={{color: data.color || 'black'}}>{data.name}</span>
+            <Row>
+              <FileIcon onClick={null}>■</FileIcon>
+              <span style={{color: data.color || 'black'}}>{data.name}</span>
+            </Row>
           </LastNode>
         :null}
       </React.Fragment>
@@ -161,8 +163,7 @@ export default class Tree extends React.Component {
 }
 
 const TreeWrapper = css`
-  height: 400px;
-  background-color: red;
+  background-color: grey;
 `;
 
 const rotateRB = keyframes`
@@ -183,9 +184,17 @@ const rotateBR = keyframes`
     transform: rotate(-90deg);
   }
 `;
+const Row = styled.div`
+  display: inline-block;
+  background-color: rgba(0,0,0,0.1);
+`;
 
 const Node = styled.div`
-  background-color: yellow;
+ // background-color: rgba(112,131,98,0.1);
+`;
+const FileIcon = styled.span`
+  margin: 3px;
+ // background-color: rgba(112,131,98,0.1);
 `;
 
 const Space = styled.span`
@@ -203,7 +212,7 @@ const RotateBR = styled.span`
   font-size: 1.2rem;
 `;
 
-const LastNode = styled.li`
-  background-color: red;
+const LastNode = styled.div`
+ // background-color: red;
 `;
 

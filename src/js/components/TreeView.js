@@ -125,25 +125,27 @@ export default class SimpleTreeView extends React.Component {
   }
 
   //クリックしたやつの一段階下だけ適用
-  doUnderOne(tData, fileState = null, dirState = null) {
+  doUnderOne(tData, selfState = null, fileState = null, dirState = null) {
     if (!fileState && !dirState) return;
-    let newData = this.doUnderOneLoop(tData, fileState, dirState);
+    let newData = this.doUnderOneLoop(tData, selfState, fileState, dirState);
     this.setState({data: newData});
     console.log('file', newData);
   }
 
-  doUnderOneLoop(tData, fileState, dirState, found = false, allData = this.state.data) {
+  doUnderOneLoop(tData, selfState, fileState, dirState, found = false, allData = this.state.data) {
     let currentTree = [];
     for (let data of allData) {
       if (data.children && data.children.length) {
         //have child
-        if (found) Object.assign(data, dirState);
+        if (data.id == tData.id) Object.assign(data, selfState);
+        else if (found) Object.assign(data, dirState);
         found = (data.id == tData.id) ? true : false;
-        data.children = this.doUnderOneLoop(tData, fileState, dirState, found, data.children);
+        data.children = this.doUnderOneLoop(tData, selfState, fileState, dirState, found, data.children);
         found = false;
       } else if (data.children) {
         //empty dir
-        if (found) Object.assign(data, dirState);
+        if (data.id == tData.id) Object.assign(data, selfState);
+        else if (found) Object.assign(data, dirState);
       } else {
         //lastnode
         if (found) Object.assign(data, fileState);
