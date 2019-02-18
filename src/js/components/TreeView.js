@@ -44,9 +44,10 @@ export default class SimpleTreeView extends React.Component {
     if (this.props.renderLastNode) return this.props.renderLastNode(data, level);
     return (<li style={{marginLeft: level * 5}}>{level}{data.name}</li>);
   }
-
-  doAll(tData, state = null, isLastNode = true) {
-    let newData = this.doChildrenLoop(tData, state, isLastNode);
+  
+  // すべてのnodeに適用
+  doAll(state = null, isLastNode = true) {
+    let newData = this.doChildrenLoop(state, isLastNode);
       this.setState({data: newData});
   }
 
@@ -55,9 +56,12 @@ export default class SimpleTreeView extends React.Component {
     for (let data of allData) {
       if (data.children) {
         Object.assign(data, state);
-        data.children.push(this.doAllLoop(state, isLastNode, data.children));
+        data.children = this.doAllLoop(state, isLastNode, data.children);
         currentTree.push(data);
+      } else if (data.children) {
+        //empty dir
       } else {
+        //lastnode
         if (isLastNode) {
           Object.assign(data, state);
         }
@@ -78,34 +82,64 @@ export default class SimpleTreeView extends React.Component {
       if (data.id == tData.id) found = true;
       if (data.children) {
         if ((data.id != tData.id && own) && found) Object.assign(data, state);
-        data.children.push(this.doChildrenLoop(tData, state, own, isLastNode, found, data.children));
-        currentTree.push(data);
+        data.children = this.doChildrenLoop(tData, state, own, isLastNode, found, data.children);
         found = false;
       } else {
         if (isLastNode) {
           if(found) Object.assign(data, state);
         }
-        currentTree.push(data);
       }
+      currentTree.push(data);
     }
     return currentTree;
   }
 
-  doFileDirectory(tData, fileState = null, dirState = null) {
+  //クリックしたやつの下位に再帰的に適用
+  doUnderTree(tData, selfState = null, fileState = null, dirState = null) {
     if (!fileState && !dirState) return;
-    let newData = this.doFileDirectoryLoop(tData, fileState, dirState);
+    let newData = this.doUnderTreeLoop(tData, selfState, fileState, dirState);
     this.setState({data: newData});
     console.log('file', newData);
   }
 
-  doFileDirectoryLoop(tData, fileState, dirState, found = false, allData = this.state.data) {
+  doUnderTreeLoop(tData, selfState, fileState, dirState, found = false, allData = this.state.data) {
     let currentTree = [];
     for (let data of allData) {
       if (data.id == tData.id) found = true;
+      const apply = (data.id == tData.id) && selfState;
+      if (data.children && data.children.length) {
+        //have child
+        if (found) Object.assign(data, apply && selfState || dirState);
+        data.children = this.doUnderTreeLoop(tData, selfState, fileState, dirState, found, data.children);
+        found = false;
+      } else if (data.children) {
+        //empty dir
+        if (found) Object.assign(data, apply && selfState || dirState);
+      } else {
+        //lastnode
+        if (found) Object.assign(data, fileState);
+      }
+      currentTree.push(data);
+    }
+    return currentTree;
+  }
+
+  //クリックしたやつの一段階下だけ適用
+  doUnderOne(tData, fileState = null, dirState = null) {
+    if (!fileState && !dirState) return;
+    let newData = this.doUnderOneLoop(tData, fileState, dirState);
+    this.setState({data: newData});
+    console.log('file', newData);
+  }
+
+  doUnderOneLoop(tData, fileState, dirState, found = false, allData = this.state.data) {
+    let currentTree = [];
+    for (let data of allData) {
       if (data.children && data.children.length) {
         //have child
         if (found) Object.assign(data, dirState);
-        data.children = this.doFileDirectoryLoop(tData, fileState, dirState, found, data.children)
+        found = (data.id == tData.id) ? true : false;
+        data.children = this.doUnderOneLoop(tData, fileState, dirState, found, data.children);
         found = false;
       } else if (data.children) {
         //empty dir

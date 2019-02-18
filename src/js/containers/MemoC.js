@@ -38,7 +38,7 @@ export default class MemoC extends Container {
           name: 'nested parent',
           active: true,
           type : 'dir',
-          toggled: true,
+          toggle: true,
           children: [
             {
               id : 'sfq1111113&',

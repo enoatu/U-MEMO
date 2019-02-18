@@ -47,8 +47,9 @@ export default class Tree extends React.Component {
   }
   onOpen(data) {
     console.warn('open');
-      const newData = this.treeRef.current.doFileDirectory(
+      const newData = this.treeRef.current.doUnderTree(
         data,
+        {toggle: true, active: true}, //selfState
         {active: true}, //filestate
         {toggle: true, active: true}, //dirstate
       );
@@ -60,10 +61,12 @@ export default class Tree extends React.Component {
   }
   onClose(data) {
     console.warn('close');
-      const newData = this.treeRef.current.doFileDirectory(
+      const newData = this.treeRef.current.doUnderTree(
         data,
+        {toggle: false, active: true}, //selfState
         {active: false}, //filestate
         {toggle: false, active: false}, //dirstate
+        false, //self apply
       );
       //const newData = this.treeRef.current.doChildren(
       //  data,
@@ -91,21 +94,25 @@ export default class Tree extends React.Component {
     return(
       <Subscribe to={[MemoC]}>
         {(memo) => (
-          <Node key={data.id}>
-            {data.toggle ?
-              <React.Fragment>
-                <Space level={level}/>
-                <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
-                <span style={{color: data.color || 'black'}}>{data.name}</span>
-              </React.Fragment>
-            :
-              <React.Fragment>
-                <Space level={level}/>
-                <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
-                <span style={{color: data.color || 'black'}}>{data.name}</span>
-              </React.Fragment>
-            }
-            </Node>
+          <React.Fragment>
+            { data.active ?
+              <Node key={data.id}>
+                {data.toggle?
+                  <React.Fragment>
+                    <Space level={level}/>
+                    <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
+                    <span style={{color: data.color || 'black'}}>{data.name}</span>
+                  </React.Fragment>
+                :
+                  <React.Fragment>
+                    <Space level={level}/>
+                    <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
+                    <span style={{color: data.color || 'black'}}>{data.name}</span>
+                  </React.Fragment>
+                }
+                </Node>
+            :null}
+          </React.Fragment>
         )}
       </Subscribe>
     );
