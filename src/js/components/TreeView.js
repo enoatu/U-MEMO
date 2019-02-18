@@ -53,7 +53,7 @@ export default class SimpleTreeView extends React.Component {
   doAllLoop(state, isLastNode, allData = this.state.data) {
     let currentTree = [];
     for (let data of allData) {
-      if (data.children && data.children.length) {
+      if (data.children) {
         Object.assign(data, state);
         data.children.push(this.doAllLoop(state, isLastNode, data.children));
         currentTree.push(data);
@@ -69,14 +69,14 @@ export default class SimpleTreeView extends React.Component {
 
   doChildren(tData, state = null, own = false, isLastNode = true) {
     let newData = this.doChildrenLoop(tData, state, own, isLastNode);
-      this.setState({data: newData});
+    this.setState({data: newData});
   }
 
   doChildrenLoop(tData, state, own, isLastNode, found = false, allData = this.state.data) {
     let currentTree = [];
     for (let data of allData) {
       if (data.id == tData.id) found = true;
-      if (data.children && data.children.length) {
+      if (data.children) {
         if ((data.id != tData.id && own) && found) Object.assign(data, state);
         data.children.push(this.doChildrenLoop(tData, state, own, isLastNode, found, data.children));
         currentTree.push(data);
@@ -89,9 +89,38 @@ export default class SimpleTreeView extends React.Component {
       }
     }
     return currentTree;
- }
+  }
+
+  doFileDirectory(tData, fileState = null, dirState = null) {
+    if (!fileState && !dirState) return;
+    let newData = this.doFileDirectoryLoop(tData, fileState, dirState);
+    this.setState({data: newData});
+    console.log('file', newData);
+  }
+
+  doFileDirectoryLoop(tData, fileState, dirState, found = false, allData = this.state.data) {
+    let currentTree = [];
+    for (let data of allData) {
+      if (data.id == tData.id) found = true;
+      if (data.children && data.children.length) {
+        //have child
+        if (found) Object.assign(data, dirState);
+        data.children = this.doFileDirectoryLoop(tData, fileState, dirState, found, data.children)
+        found = false;
+      } else if (data.children) {
+        //empty dir
+        if (found) Object.assign(data, dirState);
+      } else {
+        //lastnode
+        if (found) Object.assign(data, fileState);
+      }
+      currentTree.push(data);
+    }
+    return currentTree;
+  }
 
   render() {
+    console.log('render',this.state.data);
     return this.createTree();
   }
 

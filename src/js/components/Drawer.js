@@ -10,9 +10,6 @@ const MenuItemGroup = Menu.ItemGroup;
 
 export default class CustomDrawer extends React.Component {
   renderNode = node => {
-        //className={cx('node', {
-        //  'is-active': node === this.state.active
-        //})}
     return (
       <span
         onClick={this.onClickNode.bind(null, node)}
@@ -24,6 +21,7 @@ export default class CustomDrawer extends React.Component {
   render() {
               //onChange={this.handleChange}
       //
+
     return (
       <Subscribe to={[DrawerC]}>
         {(drawer) => (

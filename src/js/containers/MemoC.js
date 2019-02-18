@@ -6,7 +6,7 @@ export default class MemoC extends Container {
     {
       id : 'sfsgasfq1111113&',
       name: 'parent1',
-      toggled: true,
+      toggle: true,
       active: true,
       type : 'dir',
       children: [
@@ -31,7 +31,7 @@ export default class MemoC extends Container {
       name: 'parent2',
       active: true,
       type : 'dir',
-      toggled: true,
+      toggle: true,
       children: [
         {
           id : '11fsfi1113&',
@@ -48,17 +48,11 @@ export default class MemoC extends Container {
               content : 'ssssss',
             },
             {
-              id : 'sfsgasssfq111&',
-              name: 'child4',
-              active: true,
-              type : 'file',
-              content : 'test',
-            },
-            {
-              id : 'sfsgasssfsgsgq111&',
+              id : 'sfsgassfsssfsgsgq111&',
               name: 'child5',
               active: true,
               type : 'dir',
+              toggle: true,
               children: [],
             },
           ]
@@ -88,7 +82,6 @@ export default class MemoC extends Container {
       dir.children.push = ({
         id : uuid,
         name: name,
-        toggled: true,
         type : 'file',
         content : '',
       });
