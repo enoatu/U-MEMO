@@ -18,8 +18,8 @@ export default class Tree extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      type: null,
-      input: null,
+      type: 'file',
+      selectedId: null,
     };
     this.onRadioChange = this.onRadioChange.bind(this);
     this.onClose = this.onClose.bind(this);
@@ -43,6 +43,7 @@ export default class Tree extends React.Component {
       type: e.target.type,
     });
   }
+
   onOpen(data) {
     console.warn('open');
       const newData = this.treeRef.current.doUnderOne(
@@ -60,32 +61,55 @@ export default class Tree extends React.Component {
 
   onClose(data) {
     console.warn('close');
-      const newData = this.treeRef.current.doUnderTree(
-        data,
-        {toggle: false, active: true}, //selfState
-        {active: false}, //filestate
-        {toggle: false, active: false}, //dirstate
-      );
-      return(
-        <Subscribe to={[MemoC]}>
-          {(memo) => memo.setState({data: newData})}
-        </Subscribe>
-      );
+    const newData = this.treeRef.current.doUnderTree(
+      data,
+      {toggle: false, active: true}, //selfState
+      {active: false}, //filestate
+      {toggle: false, active: false}, //dirstate
+    );
+    return(
+      <Subscribe to={[MemoC]}>
+        {(memo) => memo.setState({data: newData})}
+      </Subscribe>
+    );
   }
 
   onSelect(data) {
     //ひとつだけ
-      const newData = this.treeRef.current.doOne(
-        data,
-        {select: true},
-        {select: false}
-      );
-      console.log("color",newData);
-      return(
-        <Subscribe to={[MemoC]}>
-          {(memo) => memo.setState({data: newData})}
-        </Subscribe>
-      );
+    const newData = this.treeRef.current.doOne(
+      data,
+      {select: true}, //selfState
+      {select: false} //othersState
+    );
+    this.setState({selectedId: data.id});
+    console.log("color",newData, data.id);
+    return(
+      <Subscribe to={[MemoC]}>
+        {(memo) => memo.setState({
+          data: newData
+        })}
+      </Subscribe>
+    );
+  }
+
+  onCreate(name) {
+    if (!name) return console.warn('non name');
+    console.warn(
+      this.state.selectedId,
+      name,
+      this.state.type);
+    const newData = this.treeRef.current.doCreate(
+      this.state.selectedId,
+      name,
+      this.state.type
+    );
+    return(
+      <Subscribe to={[MemoC]}>
+        {(memo) =>
+          memo.setState({data: newData})
+        }
+      </Subscribe>
+    );
   }
 
   renderNode(data, level) {
@@ -165,7 +189,7 @@ export default class Tree extends React.Component {
                 style={{width: '60%'}}
                 placeholder="name"
                 enterButton="追加"
-                onSearch={value => console.log(value)}
+                onSearch={value => this.onCreate(value)}
               />
             </InputGroup>
         </div>

@@ -203,38 +203,130 @@ export default class SimpleTreeView extends React.Component {
     return this.createTree();
   }
 
-  onCreate(dirId, name, type) {
-    const uuid = getUniqueStr();
-    let dir = onFindDataById(dirId, data);
-    if (!dir) return console.warn('not-found: '+ dirId);
-    if (!dir.children) return console.warn(dirId + ' is not directory');
+  doCreate(id, name, type) {
+    console.warn(1);
+    const uuid = this.getUniqueStr();
+    if (!name) return console.warn('no name error');
+    let elem = null;
     if (type == 'dir') {
-      dir.children.push = ({
+      elem = {
         id : uuid,
         name: name,
         toggled: true,
         active: true,
+        select: false,
         type : 'dir',
         children: [],
-      });
+      };
     } else {
-      dir.children.push = ({
+      elem = {
         id : uuid,
         name: name,
         toggled: true,
         active: true,
         type : 'file',
+        select: false,
         content : '',
-      });
+      };
     }
+    console.warn(2);
+    let newData = this.doCreateLoop(id, elem);
+    this.setState({data: newData});
+    console.log('doOne', newData);
   }
 
-  onFindDataById(id, data) {
-    for (let d of data) {
-      if (d.id == dirId) {
-        return d;
+  doCreateLoop(id, elem, found = false, allData = this.state.data) {
+    let currentTree = [];
+    for (let data of allData) {
+      if (data.id == id) found = true;
+
+      if (data.children && data.children.length) {
+        //have child
+        if (found) {
+          data.children.push(elem);
+          found = false;
+        }
+        data.children = this.doCreateLoop(id, elem, found, data.children);
+        found = false;
+      } else if (data.children) {
+        //empty dir
+        if (found) data.children.push(elem);
+      } else {
+        //lastnode
       }
+      currentTree.push(data);
     }
-    if(d.children) return onFindDataById(id, d.children);
+    return currentTree;
+  }
+
+//未テスト
+  doRemove(id) {
+    let newData = this.doRemoveLoop(id);
+    this.setState({data: newData});
+    console.log('doOne', newData);
+  }
+
+  doRemoveLoop(id, found = false, allData = this.state.data) {
+    let currentTree = [];
+    for (let data of allData) {
+
+      if (data.children && data.children.length) {
+        //have child
+        let children = null;
+        if (!found) {
+          const delIndex = data.children.findIndex(n => data.children[n].id === id);
+          if (delIndex) {
+              data.children.splice(delIndex, 1);
+              children = data.children;
+              found = false;
+          }
+        }
+        data.children = this.doRemoveLoop(id, found, data.children);
+        found = false;
+      } else if (data.children) {
+        //empty dir
+      } else {
+        //lastnode
+      }
+      currentTree.push(data);
+    }
+    return currentTree;
+  }
+
+ /// doCreateLoop(tData, found= false,  allData = this.state.data) {
+ ///   let currentTree = [];
+ ///   for (let data of allData) {
+ ///     if (data.children && data.children.length) {
+ ///       //have child
+ ///       if (!found && data.id == tData.id) {
+ ///         data.children.push(elem);
+ ///         Object.assign(data, data.children);
+ ///         found = true;
+ ///       }
+ ///       data.children = this.doOneLoop(tData, selfState, othersState, found, data.children);
+ ///     } else if (data.children) {
+ ///       //empty dir
+ ///       if (!found && data.id == tData.id) {
+ ///         data.children.push(elem);
+ ///         Object.assign(data, selfState);
+ ///         found = true;
+ ///       } else {
+ ///         if (othersState) Object.assign(data, othersState);
+ ///       }
+ ///     } else {
+ ///       if (!found && data.id == tData.id) {
+ ///         Object.assign(data, selfState);
+ ///         found = true;
+ ///       } else {
+ ///         if (othersState) Object.assign(data, othersState);
+ ///       }
+ ///     }
+ ///     currentTree.push(data);
+ ///   }
+ ///   return currentTree;
+ /// }
+
+  getUniqueStr() {
+    return new Date().getTime().toString(16);
   }
 }

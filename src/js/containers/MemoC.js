@@ -2,6 +2,7 @@ import { Container } from 'unstated';
 
 export default class MemoC extends Container {
   state = {
+    selectedId: null,
    data: [
     {
       id : 'sfsgasfq1111113&',
@@ -72,37 +73,37 @@ export default class MemoC extends Container {
     
   ];
 
-  onCreate(dirId, name, type) {
-    const uuid = getUniqueStr();
-    let dir = onFindDataById(dirId, data);
-    if (!dir) return console.warn('not-found: '+ dirId);
-    if (!dir.children) return console.warn(dirId + ' is not directory');
-    if (type == 'dir') {
-      dir.children.push = ({
-        id : uuid,
-        name: name,
-        toggled: true,
-        type : 'dir',
-        children: [],
-      });
-    } else {
-      dir.children.push = ({
-        id : uuid,
-        name: name,
-        type : 'file',
-        content : '',
-      });
-    }
-  }
+  //onCreate(dirId, name, type) {
+  //  const uuid = getUniqueStr();
+  //  let dir = onFindDataById(dirId, data);
+  //  if (!dir) return console.warn('not-found: '+ dirId);
+  //  if (!dir.children) return console.warn(dirId + ' is not directory');
+  //  if (type == 'dir') {
+  //    dir.children.push = ({
+  //      id : uuid,
+  //      name: name,
+  //      toggled: true,
+  //      type : 'dir',
+  //      children: [],
+  //    });
+  //  } else {
+  //    dir.children.push = ({
+  //      id : uuid,
+  //      name: name,
+  //      type : 'file',
+  //      content : '',
+  //    });
+  //  }
+  //}
 
-  onFindDataById(id, data) {
-    for (let d of data) {
-      if (d.id == dirId) {
-        return d;
-      }
-    }
-    if(d.children) return onFind(id, d.children);
-  }
+  //onFindDataById(id, data) {
+  //  for (let d of data) {
+  //    if (d.id == dirId) {
+  //      return d;
+  //    }
+  //  }
+  //  if(d.children) return onFind(id, d.children);
+  //}
 
   getUniqueStr() {
     return new Date().getTime().toString(16);
