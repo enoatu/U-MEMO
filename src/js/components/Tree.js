@@ -25,10 +25,8 @@ export default class Tree extends React.Component {
     this.onClose = this.onClose.bind(this);
     this.onOpen = this.onOpen.bind(this);
     this.treeRef = React.createRef();
-   // this.onToggle = this.onToggle.bind(this);
   }
   componentDidMount() {
- //   this.initData();
   }
 
 //  initData() {
@@ -75,9 +73,14 @@ export default class Tree extends React.Component {
       );
   }
 
-  onColor(data) {
-      const newData = this.treeRef.current.doChildren(data, {color: 'white'}, true);
-      console.log("newda",newData);
+  onSelect(data) {
+    //ひとつだけ
+      const newData = this.treeRef.current.doOne(
+        data,
+        {select: true},
+        {select: false}
+      );
+      console.log("color",newData);
       return(
         <Subscribe to={[MemoC]}>
           {(memo) => memo.setState({data: newData})}
@@ -97,7 +100,12 @@ export default class Tree extends React.Component {
                     <Space level={level}/>
                     <Row>
                     <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
-                      <span style={{color: data.color || 'black'}}>{data.name}</span>
+                      <NodeSpan
+                        onClick={() => this.onSelect(data)}
+                        select={data.select}
+                      >
+                        {data.name}
+                      </NodeSpan>
                     </Row>
                   </React.Fragment>
                 :
@@ -105,7 +113,7 @@ export default class Tree extends React.Component {
                     <Space level={level}/>
                     <Row>
                       <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
-                      <span style={{color: data.color || 'black'}}>{data.name}</span>
+                      <span>{data.name}</span>
                     </Row>
                   </React.Fragment>
                 }
@@ -124,7 +132,12 @@ export default class Tree extends React.Component {
             <Space level={level}/>
             <Row>
               <FileIcon onClick={null}>■</FileIcon>
-              <span style={{color: data.color || 'black'}}>{data.name}</span>
+                <NodeSpan
+                  onClick={() => this.onSelect(data)}
+                  select={data.select}
+                >
+                  {data.name}
+                </NodeSpan>
             </Row>
           </LastNode>
         :null}
@@ -187,6 +200,10 @@ const rotateBR = keyframes`
 const Row = styled.div`
   display: inline-block;
   background-color: rgba(0,0,0,0.1);
+`;
+
+const NodeSpan = styled.span`
+  background-color: ${props => props.select ? 'pink' : 'white'};
 `;
 
 const Node = styled.div`

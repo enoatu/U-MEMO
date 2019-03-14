@@ -38,10 +38,12 @@ export default class SimpleTreeView extends React.Component {
 
   renderNode(data, level) {
     if(this.props.renderNode) return this.props.renderNode(data, level);
+    //デフォルト
     return (<li style={{marginLeft: level * 5}}>{level}{data.name}</li>);
   }
   renderLastNode(data, level) {
     if (this.props.renderLastNode) return this.props.renderLastNode(data, level);
+    //デフォルト
     return (<li style={{marginLeft: level * 5}}>{level}{data.name}</li>);
   }
   
@@ -118,6 +120,47 @@ export default class SimpleTreeView extends React.Component {
       } else {
         //lastnode
         if (found) Object.assign(data, fileState);
+      }
+      currentTree.push(data);
+    }
+    return currentTree;
+  }
+
+  //クリックしたやつだけ適用
+  doOne(tData, selfState = null, othersState = null) {
+    if (!selfState && !othersState) return;
+    let newData = this.doOneLoop(tData, selfState, othersState);
+    this.setState({data: newData});
+    console.log('doOne', newData);
+  }
+
+  doOneLoop(tData, selfState, othersState, found = false,  allData = this.state.data) {
+    let currentTree = [];
+    for (let data of allData) {
+      if (data.children && data.children.length) {
+        //have child
+        if (!found && data.id == tData.id) {
+          Object.assign(data, selfState);
+          found = true;
+        } else {
+          if (othersState) Object.assign(data, othersState);
+        }
+        data.children = this.doOneLoop(tData, selfState, othersState, found, data.children);
+      } else if (data.children) {
+        //empty dir
+        if (!found && data.id == tData.id) {
+          Object.assign(data, selfState);
+          found = true;
+        } else {
+          if (othersState) Object.assign(data, othersState);
+        }
+      } else {
+        if (!found && data.id == tData.id) {
+          Object.assign(data, selfState);
+          found = true;
+        } else {
+          if (othersState) Object.assign(data, othersState);
+        }
       }
       currentTree.push(data);
     }

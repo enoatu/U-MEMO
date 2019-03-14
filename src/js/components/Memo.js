@@ -6,25 +6,24 @@ import Tree from 'react-ui-tree';
 import MemoC from '../containers/MemoC';
 
 export default class Memo extends React.Component {
-    return (
-      <Subscribe to={[MemoC]}>
-        {(drawer) => (
-          <div>
-            <Drawer
-              onClose={drawer.onClose}
-              visible={drawer.state.open}
-              placement={'left'}
-            >
-            <Tree
-              paddingLeft={20}
-              tree={drawer.state.tree}
-              renderNode={this.renderNode}
-            />
+  return (
+    <Subscribe to={[MemoC]}>
+      {(drawer) => (
+        <div>
+          <Drawer
+            onClose={drawer.onClose}
+            visible={drawer.state.open}
+            placement={'left'}
+          >
+          <Tree
+            paddingLeft={20}
+            tree={drawer.state.tree}
+            renderNode={this.renderNode}
+          />
 
-            </Drawer>
-          </div>
-        )}
-      </Subscribe>
-    );
-  }
+          </Drawer>
+        </div>
+      )}
+    </Subscribe>
+  );
 }
