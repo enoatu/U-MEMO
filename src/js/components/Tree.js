@@ -29,15 +29,6 @@ export default class Tree extends React.Component {
   componentDidMount() {
   }
 
-//  initData() {
-//    (async () => {
-//      const result =  await storage.getItem('@Memo:key');
-//      if (result == null) return;
-//      console.log('success', result);
-//      const data = JSON.parse(result);
-//      this.setState({data: data});
-//    })();
-//  }
   onRadioChange(e) {
     this.setState({
       type: e.target.type,

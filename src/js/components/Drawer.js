@@ -19,18 +19,14 @@ class CustomDrawer extends React.Component {
       <Drawer
         onClose={this.drawer.onClose}
         visible={this.drawer.state.open}
-        placement={'left'}
+        placement='left'
         width={300}
       >
-      <Tree/>
+        <Tree/>
       </Drawer>
     );
   }
 }
-
-const DrawerStyle = {
-  minWidth: '250px',
-};
 
 const Export = () => (
   <Subscribe to={[DrawerC]}>
@@ -38,4 +34,3 @@ const Export = () => (
   </Subscribe>
 );
 export default Export;
-

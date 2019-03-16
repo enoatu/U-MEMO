@@ -1,5 +1,5 @@
 {
-    "name": "com.enoatu.gnt",
+    "name": "com.enoatu.umemo",
     "displayName": "u-memo",
     "version": "1.0.0",
     "main": "index.js",
@@ -32,9 +32,9 @@
             "cordova-plugin-whitelist": {}
         },
         "platforms": [
+            "android",
             "browser",
-            "ios",
-            "android"
+            "ios"
         ]
     },
     "devDependencies": {

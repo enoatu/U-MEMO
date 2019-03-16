@@ -4,7 +4,9 @@ import MemoC from '../containers/MemoC';
 import DrawerC from '../containers/DrawerC';
 import { List, TextareaItem } from 'antd-mobile';
 import { createForm } from 'rc-form';
+import { Input } from 'antd';
 
+const { TextArea } = Input;
 class Memo extends React.Component {
   constructor(props) {
     super(props);
@@ -18,6 +20,14 @@ class Memo extends React.Component {
     if (!this.memo.state.data.length) {
       this.memo.initData();
     }
+    if (!this.memo.state.title) {
+      const today = new Date();
+      const year  = today.getFullYear();
+      const month = today.getMonth() + 1;
+      const day   = today.getDate();
+      const displayDate = `${year}/${month}/${day}`
+      this.memo.setState({title: displayDate});
+    }
   }
   
   handleInput(key, value) {
@@ -25,28 +35,24 @@ class Memo extends React.Component {
     this.memo.save();
   }
 
-    //<p>{date.getFullYear()}/{date.getMonth() + 1}/{date.getDate()}</p>
   render() {
     const { getFieldProps } = this.props.form;
     const date = new Date();
     return (
-    <div>
-    <List>
-      <TextareaItem
-        placeholder="title"
-        autoHeight
-        onChange={v => this.handleInput('title', v)}
-      />
-      <TextareaItem
-        {...getFieldProps('count', {
-        })}
-        placeholder="Thank you !"
-        rows={10}
-        count={100}
-        onChange={v => this.handleInput('text', v)}
-      />
-    </List>
-    </div>
+      <div>
+        <List>
+          <TextareaItem
+            value={this.memo.state.title}
+            autoHeight
+            onChange={v => this.handleInput('title', v)}
+          />
+         <TextareaItem
+            placeholder="Thank you !"
+            rows={30}
+            onChange={v => this.handleInput('text', v)}
+          />
+        </List>
+      </div>
     );
   }
 }
