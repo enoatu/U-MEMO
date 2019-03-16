@@ -9,46 +9,27 @@ import UNSTATED from 'unstated-debug'
 import Tree from './components/Tree';
 import CustomDrawer from './components/Drawer';
 import DrawerC from './containers/DrawerC';
+import MemoC from './containers/MemoC';
+import Memo from './components/Memo';
 import 'antd/dist/antd.css';
+import { Drawer, List, NavBar, Icon } from 'antd-mobile';
+import 'antd-mobile/dist/antd-mobile.css';
 /***********/
-import { AppContainer } from 'react-hot-loader'
+import { AppContainer } from 'react-hot-loader';
 /***********/
-class AppC extends Container {
-  state = {
-    index: 0,
-    open: false,
-  };
-}
 
 class Home extends Component {
   render() {
-    return <Tree/>;
+    return <Memo/>;
   }
 }
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-  }
-  onRenderToolBar() {
-    return (
-      <Subscribe to={[DrawerC]}>
-        {(drawer) => (
-          <Toolbar>
-            <div className="left">
-              <ToolbarButton onClick={() => drawer.onSwitch()}>
-                <Icon icon="md-menu" />
-              </ToolbarButton>
-            </div>
-            <div className="center">
-            {drawer.state.page}
-            </div>
-            <div className="right">
-            </div>
-          </Toolbar>
-        )}
-      </Subscribe>
-    );
+    this.drawer = this.props.drawer;
+    this.memo = this.props.memo;
+    console.log(this.memo.state.color);
   }
 
   onRenderTabbar() {
@@ -61,18 +42,20 @@ export default class App extends Component {
     );
   }
 
+        //<div style={S.container}>
   render() {
     return (
-      <Subscribe to={[DrawerC]}>
-        {(drawer) => (
-          <div>
-            <div style={S.container}>
-              <CustomDrawer/>
-              {drawer.state.page == 'HOME' && <Home/>}
-            </div>
-          </div>
-        )}
-      </Subscribe>
+      <div>
+        <NavBar
+        style={{backgroundColor: this.memo.state.color}}
+         icon={<Icon type="ellipsis" />}
+         onLeftClick={() => this.props.drawer.onSwitch()}
+        >
+        U-Memo
+        </NavBar>
+        <CustomDrawer/>
+        {this.drawer.state.page == 'HOME' && <Home/>}
+      </div>
     );
   }
 }
@@ -126,10 +109,16 @@ const Button3 = styled.button`
   width:100%;
 `;
 
+const Export = () => (
+  <Subscribe to={[DrawerC, MemoC]}>
+    {(drawer,memo) => <App drawer={drawer} memo={memo} />}
+  </Subscribe>
+);
+
 ReactDOM.render(
   <AppContainer>
     <Provider>
-      <App />
+      <Export />
     </Provider>
   </AppContainer>
   , document.getElementById('main')

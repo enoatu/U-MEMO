@@ -1,29 +1,59 @@
 import React from 'react';
-import ReactDom from 'react-dom';
-import { Provider, Subscribe, Container } from 'unstated';
-import { Drawer, Menu, Icon } from 'antd';
-import Tree from 'react-ui-tree';
+import { Subscribe } from 'unstated';
 import MemoC from '../containers/MemoC';
+import DrawerC from '../containers/DrawerC';
+import { List, TextareaItem } from 'antd-mobile';
+import { createForm } from 'rc-form';
 
-export default class Memo extends React.Component {
-  return (
-    <Subscribe to={[MemoC]}>
-      {(drawer) => (
-        <div>
-          <Drawer
-            onClose={drawer.onClose}
-            visible={drawer.state.open}
-            placement={'left'}
-          >
-          <Tree
-            paddingLeft={20}
-            tree={drawer.state.tree}
-            renderNode={this.renderNode}
-          />
+class Memo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.drawer = this.props.drawer;
+    this.memo   = this.props.memo;
+    this.handleInput = this.handleInput.bind(this);
+  }
 
-          </Drawer>
-        </div>
-      )}
-    </Subscribe>
-  );
+  componentDidMount() {
+    //デフォルトディレクトリ追加
+    if (!this.memo.state.data.length) {
+      this.memo.initData();
+    }
+  }
+  
+  handleInput(key, value) {
+    this.memo.setState({[key]: value});
+    this.memo.save();
+  }
+
+    //<p>{date.getFullYear()}/{date.getMonth() + 1}/{date.getDate()}</p>
+  render() {
+    const { getFieldProps } = this.props.form;
+    const date = new Date();
+    return (
+    <div>
+    <List>
+      <TextareaItem
+        placeholder="title"
+        autoHeight
+        onChange={v => this.handleInput('title', v)}
+      />
+      <TextareaItem
+        {...getFieldProps('count', {
+        })}
+        placeholder="Thank you !"
+        rows={10}
+        count={100}
+        onChange={v => this.handleInput('text', v)}
+      />
+    </List>
+    </div>
+    );
+  }
 }
+const MemoWrap = createForm()(Memo);
+const Export = () => (
+  <Subscribe to={[DrawerC, MemoC]}>
+    {(drawer, memo) => <MemoWrap drawer={drawer} memo={memo}/>}
+  </Subscribe>
+);
+export default Export;

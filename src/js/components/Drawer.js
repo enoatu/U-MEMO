@@ -2,45 +2,40 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import { Provider, Subscribe, Container } from 'unstated';
 import { Drawer, Menu, Icon } from 'antd';
-import Tree from 'react-ui-tree';
 import DrawerC from '../containers/DrawerC';
+import styled, { css } from 'styled-components';
+import Tree from './Tree';
 
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 
-export default class CustomDrawer extends React.Component {
-  renderNode = node => {
-    return (
-      <span
-        onClick={this.onClickNode.bind(null, node)}
-      >
-        {node.module}
-      </span>
-    );
-  };
+class CustomDrawer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.drawer = this.props.drawer;
+  }
   render() {
-              //onChange={this.handleChange}
-      //
-
     return (
-      <Subscribe to={[DrawerC]}>
-        {(drawer) => (
-          <div>
-            <Drawer
-              onClose={drawer.onClose}
-              visible={drawer.state.open}
-              placement={'left'}
-            >
-            <Tree
-              paddingLeft={20}
-              tree={drawer.state.tree}
-              renderNode={this.renderNode}
-            />
-
-            </Drawer>
-          </div>
-        )}
-      </Subscribe>
+      <Drawer
+        onClose={this.drawer.onClose}
+        visible={this.drawer.state.open}
+        placement={'left'}
+        width={300}
+      >
+      <Tree/>
+      </Drawer>
     );
   }
 }
+
+const DrawerStyle = {
+  minWidth: '250px',
+};
+
+const Export = () => (
+  <Subscribe to={[DrawerC]}>
+    {drawer => <CustomDrawer drawer={drawer} />}
+  </Subscribe>
+);
+export default Export;
+
