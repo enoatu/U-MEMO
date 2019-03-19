@@ -5,10 +5,14 @@ export default class SimpleTreeView extends React.Component {
     super(props);
     this.state = {
       data: [],
+      files: [],
+      dirs: [],
       newData: [],
     }
   }
   componentDidMount() {
+    this.setState({files: this.props.files});
+    this.setState({dirs: this.props.dirs});
     this.setState({data: this.props.data});
   }
 
@@ -203,36 +207,48 @@ export default class SimpleTreeView extends React.Component {
     return this.createTree();
   }
 
-  doCreate(id, name, type) {
-    console.warn(1);
+  doCreateFile(id, name) {
+    if (!id) return;
     const uuid = this.getUniqueStr();
-    if (!name) return console.warn('no name error');
+    console.warn("file1");
     let elem = null;
-    if (type == 'dir') {
-      elem = {
-        id : uuid,
-        name: name,
-        toggled: true,
-        active: true,
-        select: false,
-        type : 'dir',
-        children: [],
-      };
-    } else {
-      elem = {
-        id : uuid,
-        name: name,
-        toggled: true,
-        active: true,
-        type : 'file',
-        select: false,
-        content : '',
-      };
-    }
-    console.warn(2);
+    let files = this.state.files;
+    files[uuid] = {};
+    files[uuid].name = name;
+    elem = {
+      id : uuid,
+      active: true,
+      type : 'file',
+      select: false,
+    };
+    console.warn("file2");
     let newData = this.doCreateLoop(id, elem);
-    this.setState({data: newData});
-    console.log('doOne', newData);
+    this.setState({data: newData, files: files});
+    console.log('doCreateFile', newData);
+    return {data: newData, files: files};
+  }
+
+  doCreateDir(id, name) {
+    if (!id) return;
+    const uuid = this.getUniqueStr();
+    let elem = null;
+    let dirs = this.state.dirs;
+    dirs[uuid] = {};
+    dirs[uuid].name = name;
+    elem = {
+      id : uuid,
+      toggled: true,
+      active: true,
+      select: false,
+      type : 'dir',
+      children: [],
+    };
+    let newData = this.doCreateLoop(id, elem);
+    this.setState({data: newData, dirs: dirs});
+    return {data: newData, dirs: dirs};
+    console.log('doCreateDir', newData);
+    console.log('doCreateDir', newData);
+    console.log('doCreateDir', newData);
   }
 
   doCreateLoop(id, elem, found = false, allData = this.state.data) {

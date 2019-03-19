@@ -4,6 +4,7 @@ export default class DrawerC extends Container {
   state = {
     open: false,
     page: 'HOME',
+    selectedId: null,
   };
   onClose = () => {
     this.setState({

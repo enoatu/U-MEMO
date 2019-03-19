@@ -7,7 +7,7 @@ import { Subscribe } from 'unstated';
 import MemoC from '../containers/MemoC';
 import DrawerC from '../containers/DrawerC';
 
-import { Input, Select } from 'antd';
+import { Input, Select, Icon, Button } from 'antd';
 const InputGroup = Input.Group;
 const Option = Select.Option;
 const Search = Input.Search;
@@ -57,29 +57,43 @@ class Tree extends React.Component {
   }
 
   onSelect(data) {
+    if (data.type == 'file') {
+      const file = this.memo.state.files[data.id];
+      this.memo.setState({title: file.title, content: file.content});
+      return;
+    }
     //ひとつだけ
     const newData = this.treeRef.current.doOne(
       data,
       {select: true}, //selfState
       {select: false} //othersState
     );
-    this.setState({selectedId: data.id});
+    this.drawer.setState({selectedId: data.id});
     console.log("color",newData, data.id);
     this.memo.setState({data: newData});
   }
 
-  onCreate(name) {
-    if (!name) return console.warn('non name');
+  onCreateFile(name = 'new file') {
     console.warn(
-      this.state.selectedId,
+      this.drawer.state.selectedId,
       name,
-      this.state.formSelectType);
-    const newData = this.treeRef.current.doCreate(
-      this.state.selectedId,
-      name,
-      this.state.formSelectType
     );
-    this.memo.setState({data: newData});
+    const result = this.treeRef.current.doCreateFile(
+      this.drawer.state.selectedId,
+      name,
+    );
+    this.memo.setState({data: result.data, files: result.files});
+  }
+  onCreateDir(name = 'new folder') {
+    console.warn(
+      this.drawer.state.selectedId,
+      name,
+    );
+    const result = this.treeRef.current.doCreateDir(
+      this.drawer.state.selectedId,
+      name,
+    );
+    this.memo.setState({data: result.newData, dirs: result.dirs});
   }
 
   renderNode(data, level) {
@@ -93,7 +107,7 @@ class Tree extends React.Component {
               <React.Fragment>
                 <Space level={level}/>
                 <Row>
-                <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
+                <RotateRB onClick={() => this.onClose(data)}><Icon type="folder-open" /></RotateRB>
                   <NodeSpan
                     onClick={() => this.onSelect(data)}
                     select={data.select}
@@ -106,7 +120,7 @@ class Tree extends React.Component {
               <React.Fragment>
                 <Space level={level}/>
                 <Row>
-                  <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
+                  <RotateBR onClick={() => this.onOpen(data)}><Icon type="folder" /></RotateBR>
                   <span>{dir.name}</span>
                 </Row>
               </React.Fragment>
@@ -125,7 +139,7 @@ class Tree extends React.Component {
           <LastNode key={data.id}>
             <Space level={level}/>
             <Row>
-              <FileIcon onClick={null}>■</FileIcon>
+              <FileIcon onClick={null}><Icon type="file-text" /></FileIcon>
                 <NodeSpan
                   onClick={() => this.onSelect(data)}
                   select={data.select}
@@ -141,29 +155,53 @@ class Tree extends React.Component {
   render(){
     return (
       <div>
+        <MakeBox>
+          <Button><Icon type="delete" /></Button>
+          <Button onClick={() => this.onCreateDir()}><Icon type="folder-add" /></Button>
+          <Button onClick={() => this.onCreateFile()}><Icon type="file-add" /></Button>
+        </MakeBox>
         <SimpleTreeView
           ref={this.treeRef}
           style={TreeWrapper}
+          files={this.memo.state.files}
+          dirs={this.memo.state.dirs}
           data={this.memo.state.data}
           renderNode={(data,level) => this.renderNode(data, level)}
           renderLastNode={(data, level) => this.renderLastNode(data, level)}
         />
-        <InputGroup compact>
-          <Select defaultValue="file" style={{width: '40%'}} >
-            <Option value="file">ファイル</Option>
-            <Option value="dir">フォルダ</Option>
-          </Select>
-          <Search
-            style={{width: '60%'}}
-            placeholder="name"
-            enterButton="追加"
-            onSearch={value => this.onCreate(value)}
-          />
-        </InputGroup>
     </div>
     );
   }
 }
+
+       // <InputGroup compact>
+       //   <Select defaultValue="file" style={{width: '40%'}} >
+       //     <Option value="file">ファイル</Option>
+       //     <Option value="dir">フォルダ</Option>
+       //   </Select>
+       //   <Search
+       //     style={{width: '60%'}}
+       //     placeholder="name"
+       //     enterButton="追加"
+       //     onSearch={value => this.onCreate(value)}
+       //   />
+       // </InputGroup>
+const MakeBox = styled.div`
+  width:100%;
+  margin: 20px 30px 20px 0px;
+  display: flex;
+  flex-direction: row;
+  Button {
+    flex: 1;
+    background-color: #fff;
+    i {
+      svg {
+        width: 2em;
+        height: 2em;
+      }
+    }
+  }
+`;
 
 const TreeWrapper = css`
   background-color: grey;
@@ -209,13 +247,13 @@ const Space = styled.span`
 `;
 const RotateRB = styled.span`
   display: inline-block;
-  animation: ${rotateRB} 0.3s linear forwards;
+  //animation: ${rotateRB} 0.3s linear forwards;
   font-size: 1.2rem;
 `;
 
 const RotateBR = styled.span`
   display: inline-block;
-  animation: ${rotateBR} 0.3s linear forwards;
+  //animation: ${rotateBR} 0.3s linear forwards;
   font-size: 1.2rem;
 `;
 
