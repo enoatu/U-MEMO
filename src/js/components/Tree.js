@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 
 import { Subscribe } from 'unstated';
 import MemoC from '../containers/MemoC';
+import DrawerC from '../containers/DrawerC';
 
 import { Input, Select } from 'antd';
 const InputGroup = Input.Group;
@@ -14,13 +15,11 @@ const Search = Input.Search;
 import styled, { css, keyframes } from 'styled-components';
 import SimpleTreeView from './TreeView';
 
-export default class Tree extends React.Component {
+class Tree extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      type: 'file',
-      selectedId: null,
-    };
+    this.drawer = this.props.drawer;
+    this.memo   = this.props.memo;
     this.onRadioChange = this.onRadioChange.bind(this);
     this.onClose = this.onClose.bind(this);
     this.onOpen = this.onOpen.bind(this);
@@ -30,8 +29,8 @@ export default class Tree extends React.Component {
   }
 
   onRadioChange(e) {
-    this.setState({
-      type: e.target.type,
+    this.memo.setState({
+      formSelectType: e.target.type,
     });
   }
 
@@ -43,11 +42,7 @@ export default class Tree extends React.Component {
         {active: true}, //filestate
         {toggle: false, active: true}, //dirstate
       );
-      return(
-        <Subscribe to={[MemoC]}>
-          {(memo) => memo.setState({data: newData})}
-        </Subscribe>
-      );
+      this.memo.setState({data: newData});
   }
 
   onClose(data) {
@@ -58,11 +53,7 @@ export default class Tree extends React.Component {
       {active: false}, //filestate
       {toggle: false, active: false}, //dirstate
     );
-    return(
-      <Subscribe to={[MemoC]}>
-        {(memo) => memo.setState({data: newData})}
-      </Subscribe>
-    );
+    this.memo.setState({data: newData})
   }
 
   onSelect(data) {
@@ -74,13 +65,7 @@ export default class Tree extends React.Component {
     );
     this.setState({selectedId: data.id});
     console.log("color",newData, data.id);
-    return(
-      <Subscribe to={[MemoC]}>
-        {(memo) => memo.setState({
-          data: newData
-        })}
-      </Subscribe>
-    );
+    this.memo.setState({data: newData});
   }
 
   onCreate(name) {
@@ -88,58 +73,52 @@ export default class Tree extends React.Component {
     console.warn(
       this.state.selectedId,
       name,
-      this.state.type);
+      this.state.formSelectType);
     const newData = this.treeRef.current.doCreate(
       this.state.selectedId,
       name,
-      this.state.type
+      this.state.formSelectType
     );
-    return(
-      <Subscribe to={[MemoC]}>
-        {(memo) =>
-          memo.setState({data: newData})
-        }
-      </Subscribe>
-    );
+    this.memo.setState({data: newData});
   }
 
   renderNode(data, level) {
-    return(
-      <Subscribe to={[MemoC]}>
-        {(memo) => (
-          <React.Fragment>
-            { data.active ?
-              <Node key={data.id}>
-                {data.toggle?
-                  <React.Fragment>
-                    <Space level={level}/>
-                    <Row>
-                    <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
-                      <NodeSpan
-                        onClick={() => this.onSelect(data)}
-                        select={data.select}
-                      >
-                        {data.name}
-                      </NodeSpan>
-                    </Row>
-                  </React.Fragment>
-                :
-                  <React.Fragment>
-                    <Space level={level}/>
-                    <Row>
-                      <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
-                      <span>{data.name}</span>
-                    </Row>
-                  </React.Fragment>
-                }
-                </Node>
-            :null}
-          </React.Fragment>
-        )}
-      </Subscribe>
+    const dir = this.memo.state.dirs[data.id];
+    if (!dir) return;
+    return (
+      <React.Fragment>
+        { data.active ?
+          <Node key={data.id}>
+            {data.toggle?
+              <React.Fragment>
+                <Space level={level}/>
+                <Row>
+                <RotateRB onClick={() => this.onClose(data)}>▶</RotateRB>
+                  <NodeSpan
+                    onClick={() => this.onSelect(data)}
+                    select={data.select}
+                  >
+                    {dir.name}
+                  </NodeSpan>
+                </Row>
+              </React.Fragment>
+            :
+              <React.Fragment>
+                <Space level={level}/>
+                <Row>
+                  <RotateBR onClick={() => this.onOpen(data)}>▼</RotateBR>
+                  <span>{dir.name}</span>
+                </Row>
+              </React.Fragment>
+            }
+            </Node>
+        :null}
+      </React.Fragment>
     );
   }
   renderLastNode(data, level) {
+    const file = this.memo.state.files[data.id];
+    if (!file) return;
     return(
       <React.Fragment>
         { data.active ?
@@ -151,7 +130,7 @@ export default class Tree extends React.Component {
                   onClick={() => this.onSelect(data)}
                   select={data.select}
                 >
-                  {data.name}
+                  {file.name}
                 </NodeSpan>
             </Row>
           </LastNode>
@@ -161,31 +140,27 @@ export default class Tree extends React.Component {
   }
   render(){
     return (
-      <Subscribe to={[MemoC]}>
-        {(memo) => (
-          <div>
-            <SimpleTreeView
-              ref={this.treeRef}
-              style={TreeWrapper}
-              data={memo.state.data}
-              renderNode={(data,level) => this.renderNode(data, level)}
-              renderLastNode={(data, level) => this.renderLastNode(data, level)}
-            />
-            <InputGroup compact>
-              <Select defaultValue="file" style={{width: '40%'}} >
-                <Option value="file">ファイル</Option>
-                <Option value="dir">フォルダ</Option>
-              </Select>
-              <Search
-                style={{width: '60%'}}
-                placeholder="name"
-                enterButton="追加"
-                onSearch={value => this.onCreate(value)}
-              />
-            </InputGroup>
-        </div>
-        )}
-      </Subscribe>
+      <div>
+        <SimpleTreeView
+          ref={this.treeRef}
+          style={TreeWrapper}
+          data={this.memo.state.data}
+          renderNode={(data,level) => this.renderNode(data, level)}
+          renderLastNode={(data, level) => this.renderLastNode(data, level)}
+        />
+        <InputGroup compact>
+          <Select defaultValue="file" style={{width: '40%'}} >
+            <Option value="file">ファイル</Option>
+            <Option value="dir">フォルダ</Option>
+          </Select>
+          <Search
+            style={{width: '60%'}}
+            placeholder="name"
+            enterButton="追加"
+            onSearch={value => this.onCreate(value)}
+          />
+        </InputGroup>
+    </div>
     );
   }
 }
@@ -248,3 +223,9 @@ const LastNode = styled.div`
  // background-color: red;
 `;
 
+const Export = () => (
+  <Subscribe to={[DrawerC, MemoC]}>
+    {(drawer, memo) => <Tree drawer={drawer} memo={memo}/>}
+  </Subscribe>
+);
+export default Export;

@@ -25,7 +25,7 @@ class Memo extends React.Component {
       const year  = today.getFullYear();
       const month = today.getMonth() + 1;
       const day   = today.getDate();
-      const displayDate = `${year}/${month}/${day}`
+      const displayDate = `${year}/${month}/${day}`;
       this.memo.setState({title: displayDate});
     }
   }

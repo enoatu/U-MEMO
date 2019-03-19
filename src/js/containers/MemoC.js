@@ -7,16 +7,44 @@ export default class MemoC extends Container {
     text: '',
     charCount: 0,
     color: '#e3acae',
-    formSelectType: null,
+    formSelectType: 'file',
     formInputText: null,
     treeSelectId: null,
     saveCount: 0,
     content: '',
     selectedId: null,
+    dirs: {
+      'sfsgasfq1111113&': {
+        name: 'parent1',
+      },
+      '1111113&': {
+        name: 'parent2',
+      },
+      '11fsfi1113&': {
+        name: 'nested parent',
+      },
+    },
+    files: {
+      'sfsgsssssssxjsfq1111113&': {
+        name: 'child1',
+        content: 'conte',
+      },
+      'sfsgasfq111&': {
+        name: 'child2',
+        content: 'conte',
+      },
+      'sfq1111113&': {
+        name: 'child3',
+        content: 'conte',
+      },
+      'sfsgassfsssfsgsgq111&': {
+        name: 'child5',
+        content: 'conte',
+      }
+    },
     data: [
      {
        id : 'sfsgasfq1111113&',
-       name: 'parent1',
        toggle: true,
        active: true,
        select: false,
@@ -24,25 +52,20 @@ export default class MemoC extends Container {
        children: [
          {
            id : 'sfsgsssssssxjsfq1111113&',
-           name: 'child1',
            active: true,
            select: false,
            type : 'file',
-           content : 'ssss',
          },
          {
-           id : 'sfsgasfq111&',
-           name: 'child2',
+           id: 'sfsgasfq111&',
            active: true,
            select: false,
            type : 'file',
-           content : '',
          },
        ]
      },
      {
        id : '1111113&',
-       name: 'parent2',
        active: true,
        select: false,
        type : 'dir',
@@ -50,7 +73,6 @@ export default class MemoC extends Container {
        children: [
          {
            id : '11fsfi1113&',
-           name: 'nested parent',
            active: true,
            select: false,
            type : 'dir',
@@ -58,15 +80,12 @@ export default class MemoC extends Container {
            children: [
              {
                id : 'sfq1111113&',
-               name: 'child3',
                active: true,
                select: false,
                type : 'file',
-               content : 'ssssss',
              },
              {
                id : 'sfsgassfsssfsgsgq111&',
-               name: 'child5',
                active: true,
                select: false,
                type : 'dir',
