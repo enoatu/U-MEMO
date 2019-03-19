@@ -47,6 +47,7 @@ class Memo extends React.Component {
             onChange={v => this.handleInput('title', v)}
           />
          <TextareaItem
+            value={this.memo.state.content}
             placeholder="Thank you !"
             rows={30}
             onChange={v => this.handleInput('text', v)}

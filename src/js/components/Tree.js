@@ -58,18 +58,19 @@ class Tree extends React.Component {
 
   onSelect(data) {
     if (data.type == 'file') {
+      //ファイルクリックされたら反映
       const file = this.memo.state.files[data.id];
-      this.memo.setState({title: file.title, content: file.content});
+      this.memo.setState({title: file.name, content: file.content});
+      this.drawer.onClose();
       return;
     }
-    //ひとつだけ
+      //ディレクトリクリックで選択
     const newData = this.treeRef.current.doOne(
       data,
       {select: true}, //selfState
       {select: false} //othersState
     );
     this.drawer.setState({selectedId: data.id});
-    console.log("color",newData, data.id);
     this.memo.setState({data: newData});
   }
 
@@ -121,7 +122,12 @@ class Tree extends React.Component {
                 <Space level={level}/>
                 <Row>
                   <RotateBR onClick={() => this.onOpen(data)}><Icon type="folder" /></RotateBR>
-                  <span>{dir.name}</span>
+                  <NodeSpan
+                    onClick={() => this.onSelect(data)}
+                    select={data.select}
+                  >
+                    {dir.name}
+                  </NodeSpan>
                 </Row>
               </React.Fragment>
             }
@@ -138,7 +144,7 @@ class Tree extends React.Component {
         { data.active ?
           <LastNode key={data.id}>
             <Space level={level}/>
-            <Row>
+            <FileRow themeColor={this.memo.state.color}>
               <FileIcon onClick={null}><Icon type="file-text" /></FileIcon>
                 <NodeSpan
                   onClick={() => this.onSelect(data)}
@@ -146,7 +152,7 @@ class Tree extends React.Component {
                 >
                   {file.name}
                 </NodeSpan>
-            </Row>
+            </FileRow>
           </LastNode>
         :null}
       </React.Fragment>
@@ -188,7 +194,7 @@ class Tree extends React.Component {
        // </InputGroup>
 const MakeBox = styled.div`
   width:100%;
-  margin: 20px 30px 20px 0px;
+  margin: 40px 30px 40px 0px;
   display: flex;
   flex-direction: row;
   Button {
@@ -204,7 +210,6 @@ const MakeBox = styled.div`
 `;
 
 const TreeWrapper = css`
-  background-color: grey;
 `;
 
 const rotateRB = keyframes`
@@ -227,7 +232,12 @@ const rotateBR = keyframes`
 `;
 const Row = styled.div`
   display: inline-block;
-  background-color: rgba(0,0,0,0.1);
+`;
+const FileRow = styled.div`
+  display: inline-block;
+  border-bottom: solid;
+  border-color: ${props => props.themeColor};
+  border-width: 2px;/*5ピクセルの太さにする*/
 `;
 
 const NodeSpan = styled.span`
