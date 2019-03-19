@@ -70,28 +70,27 @@ class Tree extends React.Component {
       {select: true}, //selfState
       {select: false} //othersState
     );
-    this.drawer.setState({selectedId: data.id});
-    this.memo.setState({data: newData});
+    this.memo.setState({selectedId: data.id, data: newData});
   }
 
   onCreateFile(name = 'new file') {
     console.warn(
-      this.drawer.state.selectedId,
+      this.memo.state.selectedId,
       name,
     );
     const result = this.treeRef.current.doCreateFile(
-      this.drawer.state.selectedId,
+      this.memo.state.selectedId,
       name,
     );
     this.memo.setState({data: result.data, files: result.files});
   }
   onCreateDir(name = 'new folder') {
     console.warn(
-      this.drawer.state.selectedId,
+      this.memo.state.selectedId,
       name,
     );
     const result = this.treeRef.current.doCreateDir(
-      this.drawer.state.selectedId,
+      this.memo.state.selectedId,
       name,
     );
     this.memo.setState({data: result.newData, dirs: result.dirs});

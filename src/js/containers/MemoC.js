@@ -7,6 +7,7 @@ export default class MemoC extends Container {
     text: '',
     charCount: 0,
     color: '#e3acae',
+    selectedId: null,
     formInputText: null,
     saveCount: 0,
     content: '',
