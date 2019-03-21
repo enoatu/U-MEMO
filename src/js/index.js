@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import 'babel-polyfill';
 import styled, { css } from 'styled-components';
 import { Provider, Subscribe, Container } from 'unstated';
-import UNSTATED from 'unstated-debug'
+import UNSTATED from 'unstated-debug';
+
+import { Persist } from 'react-persist';
 
 import Tree from './components/Tree';
 import CustomDrawer from './components/Drawer';
@@ -71,64 +73,6 @@ export default class App extends Component {
     );
   }
 }
-import {
-  Form, Input, Button, Radio,
-} from 'antd';
-
-class FormLayoutDemo extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      formLayout: 'horizontal',
-    };
-  }
-
-  handleFormLayoutChange = (e) => {
-    this.setState({ formLayout: e.target.value });
-  }
-
-  render() {
-    const { formLayout } = this.state;
-    const formItemLayout = formLayout === 'horizontal' ? {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 },
-    } : null;
-    const buttonItemLayout = formLayout === 'horizontal' ? {
-      wrapperCol: { span: 14, offset: 4 },
-    } : null;
-    return (
-      <div>
-        <Form layout={formLayout}>
-          <Form.Item
-            label="Form Layout"
-            {...formItemLayout}
-          >
-            <Radio.Group defaultValue="horizontal" onChange={this.handleFormLayoutChange}>
-              <Radio.Button value="horizontal">Horizontal</Radio.Button>
-              <Radio.Button value="vertical">Vertical</Radio.Button>
-              <Radio.Button value="inline">Inline</Radio.Button>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item
-            label="Field A"
-            {...formItemLayout}
-          >
-            <Input placeholder="input placeholder" />
-          </Form.Item>
-          <Form.Item
-            label="Field B"
-            {...formItemLayout}
-          >
-            <Input placeholder="input placeholder" />
-          </Form.Item>
-          <Form.Item {...buttonItemLayout}>
-            <Button type="primary">Submit</Button>
-          </Form.Item>
-        </Form>
-      </div>
-    );
-  }
-}
 
 const S = {
   container : {
@@ -181,7 +125,17 @@ const Button3 = styled.button`
 
 const Export = () => (
   <Subscribe to={[DrawerC, MemoC]}>
-    {(drawer,memo) => <App drawer={drawer} memo={memo} />}
+    {(drawer, memo) => (
+      <>
+        <Persist
+          name="u-memo"
+          data={memo.state}
+          debounce={500}
+          onMount={data => memo.setState(data)}
+        />
+        <App drawer={drawer} memo={memo} />
+      </>
+    )}
   </Subscribe>
 );
 
