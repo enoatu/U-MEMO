@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -36,13 +34,13 @@ class Tree extends React.Component {
 
   onOpen(data) {
     console.warn('open');
-      const newData = this.treeRef.current.doUnderOne(
-        data,
-        {toggle: true, active: true}, //selfState
-        {active: true}, //filestate
-        {toggle: false, active: true}, //dirstate
-      );
-      this.memo.setState({data: newData});
+    const newData = this.treeRef.current.doUnderOne(
+      data,
+      {toggle: true, active: true}, //selfState
+      {active: true}, //filestate
+      {toggle: false, active: true}, //dirstate
+    );
+    this.memo.setState({data: newData});
   }
 
   onClose(data) {
@@ -64,7 +62,7 @@ class Tree extends React.Component {
       this.drawer.onClose();
       return;
     }
-      //ディレクトリクリックで選択
+    //ディレクトリクリックで選択
     const newData = this.treeRef.current.doOne(
       data,
       {select: true}, //selfState
@@ -84,6 +82,7 @@ class Tree extends React.Component {
     );
     this.memo.setState({data: result.data, files: result.files});
   }
+
   onCreateDir(name = 'new folder') {
     console.warn(
       this.memo.state.selectedId,
@@ -93,7 +92,7 @@ class Tree extends React.Component {
       this.memo.state.selectedId,
       name,
     );
-    this.memo.setState({data: result.newData, dirs: result.dirs});
+    this.memo.setState({data: result.data, dirs: result.dirs});
   }
 
   renderNode(data, level) {
@@ -179,18 +178,6 @@ class Tree extends React.Component {
   }
 }
 
-       // <InputGroup compact>
-       //   <Select defaultValue="file" style={{width: '40%'}} >
-       //     <Option value="file">ファイル</Option>
-       //     <Option value="dir">フォルダ</Option>
-       //   </Select>
-       //   <Search
-       //     style={{width: '60%'}}
-       //     placeholder="name"
-       //     enterButton="追加"
-       //     onSearch={value => this.onCreate(value)}
-       //   />
-       // </InputGroup>
 const MakeBox = styled.div`
   width:100%;
   margin: 40px 30px 40px 0px;
