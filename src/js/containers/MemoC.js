@@ -124,40 +124,25 @@ export default class MemoC extends Container {
     })();
   }
 
-  save() {
-    saveCount++;
-    if (saveCount > 4) {
-      saveCount = 0;
-      this.doOne(this.state.treeSelectId,
-       {title: this.state.title, content: this.state.content})
-    }
-  }
-  // ひとつのnodeに適用
-  doOne(tId, state = null) {
-    if (!tId || !state) return null;
-    let newData = this.doOneLoop(tId, state);
-    this.setState({data: newData});
-  }
-
-  doOneLoop(tId, state, allData = this.state.data) {
-    let currentTree = [];
-    for (let data of allData) {
-      if (data.children) {
-        if (tId == data.id) Object.assign(data, state);
-        data.children = this.doOneLoop(tId, state, data.children);
-        currentTree.push(data);
-      } else if (data.children) {
-        //empty dir
-        if (tId == data.id) Object.assign(data, state);
-      } else {
-        //lastnode
-        if (tId == data.id) Object.assign(data, state);
-        currentTree.push(data);
+  saveFiles() {
+    (async () => {
+      try {
+        await storage.setItem('@Files:key', this.state.files);
+      } catch (error) {
+        console.log("保存に失敗しました" + error);
       }
-    }
-    return currentTree;
- }
-  saveData() {
+    })();
+  }
+  saveDirs() {
+    (async () => {
+      try {
+        await storage.setItem('@Dirs:key', this.state.dirs);
+      } catch (error) {
+        console.log("保存に失敗しました" + error);
+      }
+    })();
+  }
+  saveTree() {
     (async () => {
       try {
         await storage.setItem('@Data:key', this.state.data);

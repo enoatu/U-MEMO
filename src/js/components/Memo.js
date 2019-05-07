@@ -31,8 +31,9 @@ class Memo extends React.Component {
   }
   
   handleInput(key, value) {
+      console.log(key,value);
     this.memo.setState({[key]: value});
-    this.memo.save();
+    this.memo.saveFiles();
   }
 
   render() {
