@@ -210,7 +210,6 @@ export default class SimpleTreeView extends React.Component {
   doCreateFile(id, name) {
     if (!id) return;
     const uuid = this.getUniqueStr();
-    console.warn("file1");
     let elem = null;
     let files = this.state.files;
     files[uuid] = {};
@@ -221,10 +220,8 @@ export default class SimpleTreeView extends React.Component {
       type : 'file',
       select: false,
     };
-    console.warn("file2");
     let newData = this.doCreateLoop(id, elem);
     this.setState({data: newData, files: files});
-    console.log('doCreateFile', newData);
     return {data: newData, files: files};
   }
 
@@ -246,9 +243,6 @@ export default class SimpleTreeView extends React.Component {
     let newData = this.doCreateLoop(id, elem);
     this.setState({data: newData, dirs: dirs});
     return {data: newData, dirs: dirs};
-    console.log('doCreateDir', newData);
-    console.log('doCreateDir', newData);
-    console.log('doCreateDir', newData);
   }
 
   doCreateLoop(id, elem, found = false, allData = this.state.data) {
@@ -308,39 +302,6 @@ export default class SimpleTreeView extends React.Component {
     }
     return currentTree;
   }
-
- /// doCreateLoop(tData, found= false,  allData = this.state.data) {
- ///   let currentTree = [];
- ///   for (let data of allData) {
- ///     if (data.children && data.children.length) {
- ///       //have child
- ///       if (!found && data.id == tData.id) {
- ///         data.children.push(elem);
- ///         Object.assign(data, data.children);
- ///         found = true;
- ///       }
- ///       data.children = this.doOneLoop(tData, selfState, othersState, found, data.children);
- ///     } else if (data.children) {
- ///       //empty dir
- ///       if (!found && data.id == tData.id) {
- ///         data.children.push(elem);
- ///         Object.assign(data, selfState);
- ///         found = true;
- ///       } else {
- ///         if (othersState) Object.assign(data, othersState);
- ///       }
- ///     } else {
- ///       if (!found && data.id == tData.id) {
- ///         Object.assign(data, selfState);
- ///         found = true;
- ///       } else {
- ///         if (othersState) Object.assign(data, othersState);
- ///       }
- ///     }
- ///     currentTree.push(data);
- ///   }
- ///   return currentTree;
- /// }
 
   getUniqueStr() {
     return new Date().getTime().toString(16);

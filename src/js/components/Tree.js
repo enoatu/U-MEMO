@@ -10,7 +10,7 @@ const InputGroup = Input.Group;
 const Option = Select.Option;
 const Search = Input.Search;
 
-import styled, { css, keyframes } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import SimpleTreeView from './TreeView';
 
 class Tree extends React.Component {
@@ -18,22 +18,26 @@ class Tree extends React.Component {
     super(props);
     this.drawer = this.props.drawer;
     this.memo   = this.props.memo;
-    this.onRadioChange = this.onRadioChange.bind(this);
+    this.onRemoveSelect = this.onRemoveSelect.bind(this);
+    this.onSelectFile = this.onSelectFile.bind(this);
+    this.onSelectDir = this.onSelectDir.bind(this);
+    this.onCreateDir = this.onCreateDir.bind(this);
+    this.onCreateFile = this.onCreateFile.bind(this);
     this.onClose = this.onClose.bind(this);
     this.onOpen = this.onOpen.bind(this);
     this.treeRef = React.createRef();
   }
+
   componentDidMount() {
+    document.querySelector(".ant-drawer-content").addEventListener('click', ()  => this.onRemoveSelect());
+  }
+  componentWillUnmount() {
+    document.querySelector(".ant-drawer-content").removeEventListener('click', () => this.onRemoveSelect());
   }
 
-  onRadioChange(e) {
-    this.memo.setState({
-      formSelectType: e.target.type,
-    });
-  }
-
-  onOpen(data) {
+  onOpen(e, data) {
     console.warn('open');
+    e.stopPropagation()
     const newData = this.treeRef.current.doUnderOne(
       data,
       {toggle: true, active: true}, //selfState
@@ -43,8 +47,9 @@ class Tree extends React.Component {
     this.memo.setState({data: newData});
   }
 
-  onClose(data) {
+  onClose(e, data) {
     console.warn('close');
+    e.stopPropagation()
     const newData = this.treeRef.current.doUnderTree(
       data,
       {toggle: false, active: true}, //selfState
@@ -54,42 +59,56 @@ class Tree extends React.Component {
     this.memo.setState({data: newData})
   }
 
-  onSelect(data) {
+  onSelectDir(e, data) {
+    e.stopPropagation();
+    this.memo.setState({selectedDirId: data.id});
+  }
+  onSelectFile(e, data) {
+    e.stopPropagation();
     if (data.type == 'file') {
       //ファイルクリックされたら反映
       const file = this.memo.state.files[data.id];
-      this.memo.setState({title: file.name, content: file.content});
+      this.memo.setState({selectedFileId: data.id, title: file.name, content: file.content});
       this.drawer.onClose();
       return;
     }
-    //ディレクトリクリックで選択
-    const newData = this.treeRef.current.doOne(
-      data,
-      {select: true}, //selfState
-      {select: false} //othersState
-    );
-    this.memo.setState({selectedId: data.id, data: newData});
+    //const newData = this.treeRef.current.doOne(
+    //  data,
+    //  {select: true}, //selfState
+    //  {select: false} //othersState
+    //);
+    //this.memo.setState({selectedFileId: data.id, data: newData});
   }
 
-  onCreateFile(name = 'new file') {
-    console.warn(
-      this.memo.state.selectedId,
-      name,
-    );
+  onRemoveSelect(e) {
+    console.warn("removed!");
+    this.memo.setState({selectedDirId: null});
+  }
+
+  onCreateFile(e, name = 'new file') {
+    if (!this.memo.state.selectedFileId) return;
+   // console.warn(
+   //   this.memo.state.selectedFileId,
+   //   name,
+   // );
     const result = this.treeRef.current.doCreateFile(
-      this.memo.state.selectedId,
+      this.memo.state.selectedFileId,
       name,
     );
     this.memo.setState({data: result.data, files: result.files});
+    e.stopPropagation();
   }
 
-  onCreateDir(name = 'new folder') {
-    console.warn(
-      this.memo.state.selectedId,
-      name,
-    );
+  onCreateDir(e, name = 'new folder') {
+    e.stopPropagation();
+    console.warn("oooooooooooO");
+    if (!this.memo.state.selectedFileId) return;
+   // console.warn(
+   //   this.memo.state.selectedDirId,
+   //   name,
+   // );
     const result = this.treeRef.current.doCreateDir(
-      this.memo.state.selectedId,
+      this.memo.state.selectedDirId,
       name,
     );
     this.memo.setState({data: result.data, dirs: result.dirs});
@@ -104,29 +123,31 @@ class Tree extends React.Component {
           <Node key={data.id}>
             {data.toggle?
               <React.Fragment>
-                <Space level={level}/>
-                <Row>
-                <RotateRB onClick={() => this.onClose(data)}><Icon type="folder-open" /></RotateRB>
+                <DirRow level={level}>
+                  <DirIcon onClick={e => this.onClose(e, data)}>
+                    <Icon type="folder-open" />
+                  </DirIcon>
                   <NodeSpan
-                    onClick={() => this.onSelect(data)}
-                    select={data.select}
+                    onClick={e => this.onSelectDir(e, data)}
+                    select={this.memo.state.selectedDirId == data.id}
                   >
                     {dir.name}
                   </NodeSpan>
-                </Row>
+                </DirRow>
               </React.Fragment>
             :
               <React.Fragment>
-                <Space level={level}/>
-                <Row>
-                  <RotateBR onClick={() => this.onOpen(data)}><Icon type="folder" /></RotateBR>
+                <DirRow level={level}>
+                  <DirIcon onClick={e => this.onOpen(e, data)}>
+                    <Icon type="folder" />
+                  </DirIcon>
                   <NodeSpan
-                    onClick={() => this.onSelect(data)}
-                    select={data.select}
+                    onClick={e => this.onSelectDir(e, data)}
+                    select={this.memo.state.selectedDirId == data.id}
                   >
                     {dir.name}
                   </NodeSpan>
-                </Row>
+                </DirRow>
               </React.Fragment>
             }
             </Node>
@@ -134,6 +155,7 @@ class Tree extends React.Component {
       </React.Fragment>
     );
   }
+
   renderLastNode(data, level) {
     const file = this.memo.state.files[data.id];
     if (!file) return;
@@ -141,15 +163,15 @@ class Tree extends React.Component {
       <React.Fragment>
         { data.active ?
           <LastNode key={data.id}>
-            <Space level={level}/>
-            <FileRow themeColor={this.memo.state.color}>
-              <FileIcon onClick={null}><Icon type="file-text" /></FileIcon>
-                <NodeSpan
-                  onClick={() => this.onSelect(data)}
-                  select={data.select}
-                >
-                  {file.name}
-                </NodeSpan>
+            <FileRow level={level} themeColor={this.memo.state.color}>
+              <FileIcon onClick={null}>
+                <Icon type="file-text" />
+              </FileIcon>
+              <NodeSpan
+                onClick={e => this.onSelectFile(e, data)}
+              >
+                {file.name}
+              </NodeSpan>
             </FileRow>
           </LastNode>
         :null}
@@ -158,26 +180,37 @@ class Tree extends React.Component {
   }
   render(){
     return (
-      <div>
+      <Wrapper>
         <MakeBox>
-          <Button><Icon type="delete" /></Button>
-          <Button onClick={() => this.onCreateDir()}><Icon type="folder-add" /></Button>
-          <Button onClick={() => this.onCreateFile()}><Icon type="file-add" /></Button>
+          <Button>
+            <Icon type="delete" />
+          </Button>
+          <Button
+            onClick={e => this.onCreateDir(e)}
+            disabled={this.memo.state.selectedDirId == null}
+          >
+            <Icon type="folder-add" />
+          </Button>
+          <Button onClick={e => this.onCreateFile(e)}>
+            <Icon type="file-add" />
+          </Button>
         </MakeBox>
         <SimpleTreeView
           ref={this.treeRef}
-          style={TreeWrapper}
           files={this.memo.state.files}
           dirs={this.memo.state.dirs}
           data={this.memo.state.data}
           renderNode={(data,level) => this.renderNode(data, level)}
           renderLastNode={(data, level) => this.renderLastNode(data, level)}
         />
-    </div>
+    </Wrapper>
     );
   }
 }
 
+const Wrapper = styled.div`
+  height: 100%;
+`;
 const MakeBox = styled.div`
   width:100%;
   margin: 40px 30px 40px 0px;
@@ -195,66 +228,58 @@ const MakeBox = styled.div`
   }
 `;
 
-const TreeWrapper = css`
-`;
-
-const rotateRB = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(90deg);
-  }
-`;
-const rotateBR = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(-90deg);
-  }
-`;
-const Row = styled.div`
+const DirRow = styled.div`
+  margin-left: ${props => props.level * 20}px;
   display: inline-block;
 `;
+
+const DirIcon = styled.div`
+  display: inline-block;
+  background-color: #fff;
+  i {
+    svg {
+      width: 1.5em;
+      height: 1.5em;
+    }
+  }
+`;
+
 const FileRow = styled.div`
+  margin-left: ${props => props.level * 20}px;
   display: inline-block;
   border-bottom: solid;
   border-color: ${props => props.themeColor};
-  border-width: 2px;/*5ピクセルの太さにする*/
+  border-width: 2px;
+`;
+
+const FileIcon = styled.div`
+  display: inline-block;
+  background-color: #fff;
+  i {
+    svg {
+      width: 1.5em;
+      height: 1.5em;
+    }
+  }
 `;
 
 const NodeSpan = styled.span`
+  font-size: 20px;
   background-color: ${props => props.select ? 'pink' : 'white'};
 `;
 
 const Node = styled.div`
- // background-color: rgba(112,131,98,0.1);
-`;
-const FileIcon = styled.span`
-  margin: 3px;
- // background-color: rgba(112,131,98,0.1);
-`;
-
-const Space = styled.span`
-  margin: ${props => props.level * 10}px;
-`;
-const RotateRB = styled.span`
-  display: inline-block;
-  //animation: ${rotateRB} 0.3s linear forwards;
-  font-size: 1.2rem;
-`;
-
-const RotateBR = styled.span`
-  display: inline-block;
-  //animation: ${rotateBR} 0.3s linear forwards;
-  font-size: 1.2rem;
+  &:hover {
+    background-color: rgba(100,100,100, 0.1);
+  }
 `;
 
 const LastNode = styled.div`
- // background-color: red;
+  &:hover {
+    background-color: rgba(100,100,100, 0.1);
+  }
+  margin-top: 5px;
+  margin-bottom: 5px;
 `;
 
 const Export = () => (

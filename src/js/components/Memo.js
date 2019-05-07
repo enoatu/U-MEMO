@@ -16,8 +16,12 @@ class Memo extends React.Component {
   }
 
   componentDidMount() {
-    //デフォルトディレクトリ追加
+    if (!this.memo.state.selectedDirId) {
+      this.drawer.onClose();
+      return;
+    }
     if (!this.memo.state.data.length) {
+      //デフォルトディレクトリ追加
       this.memo.initData();
     }
     if (!this.memo.state.title) {
@@ -26,13 +30,13 @@ class Memo extends React.Component {
       const month = today.getMonth() + 1;
       const day   = today.getDate();
       const displayDate = `${year}/${month}/${day}`;
-      this.memo.setState({title: displayDate});
+      //this.memo.setState({title: displayDate});
     }
   }
   
   handleInput(key, value) {
     this.memo.setState({[key]: value});
-    this.memo.save();
+    this.memo.saveFile();
   }
 
   render() {
@@ -40,19 +44,16 @@ class Memo extends React.Component {
     const date = new Date();
     return (
       <div>
-        <List>
-          <TextareaItem
+          <textarea
             value={this.memo.state.title}
-            autoHeight
-            onChange={v => this.handleInput('title', v)}
+            onChange={e => this.handleInput('title', e.target.value)}
           />
-         <TextareaItem
+          <textarea
             value={this.memo.state.content}
             placeholder="Thank you !"
             rows={30}
-            onChange={v => this.handleInput('text', v)}
+            onChange={e => this.handleInput('content', e.target.value)}
           />
-        </List>
       </div>
     );
   }

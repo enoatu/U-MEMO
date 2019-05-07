@@ -2,7 +2,7 @@ import 'react-hot-loader/patch';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import 'babel-polyfill';
-import styled, { css } from 'styled-components';
+import styled, { css, createGlobalStyle } from 'styled-components';
 import { Provider, Subscribe, Container } from 'unstated';
 import UNSTATED from 'unstated-debug';
 
@@ -73,6 +73,13 @@ export default class App extends Component {
     );
   }
 }
+
+createGlobalStyle`
+  .ant-drawer-body {
+    padding: 0;
+    background-color: #red !important;
+  }
+`;
 
 const S = {
   container : {
